@@ -5,6 +5,7 @@ months_name = ["January", "February", "March", "April", "May", "June", "July", "
                "November", "December"]
 days_name = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 months_codes = [0, 3, 3, 6, 1, 4, 6, 2, 5, 0, 3, 5]
+Dates_that_has_notes = []
 
 
 class Date:
@@ -30,11 +31,23 @@ class Date:
     def get_day_of_week_as_string(self) -> str:
         return days_name[self.get_day_of_week_by_date()]
 
+    def get_amount_of_notes(self) -> int:
+        return len(self.notes)
+
+    def has_notes(self) -> bool:
+        return bool(self.notes)
+
     def get_notes(self) -> list:
         return self.notes
 
     def add_note(self, note) -> None:
+        if not self.has_notes():
+            Dates_that_has_notes.append(self)
         self.notes.append(note)
+
+    def print_notes(self) -> None:
+        for note in self.notes:
+            print(note)
 
 
 class Note:
@@ -44,8 +57,8 @@ class Note:
 
     def __repr__(self) -> str:
         if self.description:
-            return f'{self.name}\n{self.description}'
-        return f'{self.name}'
+            return f'{self.name}\n{self.description}\n'
+        return f'{self.name}\n'
 
 
 def is_leap_year(year: int) -> bool:
@@ -95,17 +108,36 @@ def print_month(month: int, year: int) -> None:
                 s2 += '    |'
             else:
                 x = f'{month_obj[7 * weeks + days - start_day].day_of_month + 1}'.zfill(2)
+                y = '  '
+                flag, date = has_notes_by_date(day=7 * weeks + days - start_day, month=month, year=year)
+                if flag:
+                    y = '*' * date.get_amount_of_notes()
+                    y = y[:2]
+                    y = y.zfill(2).replace('0', ' ')[::-1]
                 if x.startswith('0'):
                     x = x.replace('0', ' ')
-                s2 += f' {x} |'
+                s2 += f'{y}{x}|'
         if s2 != '|    |    |    |    |    |    |    |':
             print(s1)
             print(s2)
     print('+----+----+----+----+----+----+----+')
 
 
+def has_notes_by_date(day: int, month: int, year: int) -> tuple:
+    for date_in_list in Dates_that_has_notes:
+        if date_in_list.day_of_month == day and date_in_list.month == month and date_in_list.year == year:
+            return True, date_in_list
+    return False, None
+
+
 def main() -> None:
+    date_with_note = Date(10, 2, 2004, True)
+
+    date_with_note.add_note(Note(name='TestNote', description='a note to test if it works'))
+    date_with_note.add_note(Note(name='TestNote2', description='a note to test if it works'))
+    date_with_note.add_note(Note(name='TestNote3', description='a note to test if it works'))
     print_month(month=1, year=2004)
+    date_with_note.print_notes()
 
 
 if __name__ == '__main__':
